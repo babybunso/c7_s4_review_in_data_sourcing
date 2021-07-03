@@ -1,0 +1,59 @@
+
+from bs4 import BeautifulSoup
+import requests
+import pandas as pd
+import json
+import time
+
+class BS4WebScraper:
+
+    def  __init__(self, start_urls=[], name='bs4_demo'):
+        # Constructor
+        self.name = name
+        self.start_urls = start_urls
+        self.dataset = []
+
+        
+    def scrape(self):
+        # Steps 1,2,3 (Request, Parse, Output)
+        for url in self.start_urls:
+            response = self.request(url) # Step 1
+            data = self.parse(response)  # Step 2
+            self.dataset.extend(data)    # Step 3
+        return self.output()
+        
+    
+    # Step 1 Request
+    def request(self, url):
+        throttle = 2
+        time.sleep(throttle)
+        print(f'\n\n\nThrottle for {throttle} seconds...')
+        print(f'Start scraping:  {url}\n')
+        headers = {'User-Agent' : 'Mozilla/5.0 (X11; Linux x86_64)'}
+        response = requests.get(url, headers=headers).content
+        return response
+    
+    
+    # Step 2: Parse
+    def parse(self, response):
+        try:
+            soup = BeautifulSoup(response, features='lxml')
+            # items = soup.find_all('div', {'class':'index__gridItem___3VkVO'}) ### This will not work
+            # print(soup.prettify())
+            data = soup.find_all('script')[1]
+            data = data.contents[0].strip().replace('window.pageData = ', '').replace(';', '')
+            d = json.loads(str(data))
+            products = d['mods']['listItems']
+            product_urls = []
+            for p in products:
+                url = f"https:{p['productUrl']}"
+                print(url)
+                product_urls.append(url)
+            return product_urls
+        except:
+            pass
+                        
+        
+    # Step 3: Output
+    def output(self):
+        return pd.DataFrame(self.dataset)

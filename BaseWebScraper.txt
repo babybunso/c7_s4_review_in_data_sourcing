@@ -1,0 +1,21 @@
+class WebScraper:
+    
+    def  __init__(self, start_urls=[], name='WebScraper'):
+        # Constructor
+        pass
+        
+    def scrape(self):
+        # Steps 1,2,3 (Request, Parse, Output)
+        pass
+    
+    # Step 1 Request
+    def request(self, url):
+        pass
+    
+    # Step 2: Parse
+    def parse(self, response):
+        pass
+            
+    # Step 3: Output
+    def output(self, dataset):
+        pass

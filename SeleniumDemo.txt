@@ -1,0 +1,57 @@
+
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
+# from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+    
+class SeleniumWebScraper: 
+    
+    def  __init__(self, start_urls=[], headless=True, name='WebScraper'):
+        # Constructor
+        self.name = name
+        self.start_urls = start_urls
+        WEBDRIVER_PATH = '/usr/local/bin/chromedriver'        
+        if headless:
+            chrome_options = Options()
+            chrome_options.add_argument("--headless")
+            self.driver = webdriver.Chrome(chrome_options=chrome_options, executable_path=WEBDRIVER_PATH)
+        else:
+            self.driver = webdriver.Chrome(WEBDRIVER_PATH)
+                
+
+    def scrape(self):
+        # Steps 1,2,3 (Request, Parse, Output)
+        dataset = []
+        for url in self.start_urls:
+            self.request(url)     # Step 1
+            data = self.parse()   # Step 2
+            dataset.append(data)  # Step 3
+        self.driver.quit()
+        return self.output(dataset)
+    
+    
+    # Step 1 Request
+    def request(self, url):
+        throttle = 2
+        time.sleep(throttle)
+        print(f'\n\nThrottle for {throttle} seconds...')
+        self.driver.get(url)
+        print(f'Start scraping:  {url}\n')
+    
+    
+    # Step 2: Parse
+    def parse(self):
+        self.driver.execute_script('window.scrollBy(0, document.body.scrollHeight/2)', '') ## need to scroll the page to find the element
+        time.sleep(1)
+        product_detail = self.driver.find_element_by_id('module_product_detail')
+        # product_detail = WebDriverWait(self.driver, 10).until(
+        #         EC.presence_of_element_located((By.ID, "module_product_detail"))
+        # )  ## other option to wait for element
+        print(product_detail.text)
+        return product_detail.text
+            
+        
+    # Step 3: Output
+    def output(self, dataset):
+        return pd.DataFrame(dataset)
